@@ -9,6 +9,7 @@ requires = [
   "datamodel-code-generator[ruff]==0.56.1",
   "editorconfig-checker==3.6.1",
   "hatch-build-scripts==1.0.0",
+  "hatch-vcs==0.5.0",
   "hatchling==1.29.0",
   "jbang==0.8.0",
   "pip-audit==2.10.0"
@@ -36,7 +37,7 @@ artifacts = ["src/pyutemplate/generated/schemas/"]
 [[tool.hatch.build.hooks.build-scripts.scripts]]
 commands = [
   "mkdir --parents src/pyutemplate/generated/ksy/",
-  "touch src/pyutemplate/generated/__init__.py src/pyutemplate/generated/ksy/_init__.py",
+  "touch src/pyutemplate/generated/__init__.py src/pyutemplate/generated/ksy/__init__.py",
   "python -m jbang io.kaitai:kaitai-struct-compiler_2.13:0.11 --target=python --read-write --outdir=src/pyutemplate/generated/ksy/ src/pyutemplate/resources/ksy/*.ksy"
 ]
 artifacts = ["src/pyutemplate/generated/ksy/"]
@@ -47,11 +48,14 @@ commands = ["ec"]
 [[tool.hatch.build.hooks.build-scripts.scripts]]
 commands = ["hatch fmt --check"]
 
+[tool.hatch.build.hooks.vcs]
+version-file = "src/pyutemplate/generated/__about__.py"
+
 [tool.hatch.build.targets.wheel]
 artifacts = ["src/pyutemplate/generated/"]
 
 [tool.hatch.version]
-path = "src/pyutemplate/__about__.py"
+source = "vcs"
 
 [tool.ruff.lint]
 select = ["ALL"]

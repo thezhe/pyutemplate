@@ -1,0 +1,58 @@
+[project]
+name = "pyutemplate"
+requires-python = ">=3.10"
+dependencies = ["kaitaistruct==0.11"]
+dynamic = ["version"]
+
+[build-system]
+requires = [
+  "datamodel-code-generator[ruff]==0.56.1",
+  "editorconfig-checker==3.6.1",
+  "hatch-build-scripts==1.0.0",
+  "hatchling==1.29.0",
+  "jbang==0.8.0",
+  "pip-audit==2.10.0"
+]
+build-backend = "hatchling.build"
+
+[tool.datamodel-codegen]
+input = "src/pyutemplate/resources/schemas/"
+input-file-type = "jsonschema"
+output = "src/pyutemplate/generated/schemas/"
+output-model-type = "typing.TypedDict"
+formatters = ["ruff-check", "ruff-format"]
+
+[[tool.hatch.build.hooks.build-scripts.scripts]]
+commands = ["pip-audit"]
+
+[[tool.hatch.build.hooks.build-scripts.scripts]]
+commands = [
+  "mkdir --parents src/pyutemplate/generated/schemas/",
+  "touch src/pyutemplate/generated/__init__.py",
+  "datamodel-codegen"
+]
+artifacts = ["src/pyutemplate/generated/schemas/"]
+
+[[tool.hatch.build.hooks.build-scripts.scripts]]
+commands = [
+  "mkdir --parents src/pyutemplate/generated/ksy/",
+  "touch src/pyutemplate/generated/__init__.py src/pyutemplate/generated/ksy/_init__.py",
+  "python -m jbang io.kaitai:kaitai-struct-compiler_2.13:0.11 --target=python --read-write --outdir=src/pyutemplate/generated/ksy/ src/pyutemplate/resources/ksy/*.ksy"
+]
+artifacts = ["src/pyutemplate/generated/ksy/"]
+
+[[tool.hatch.build.hooks.build-scripts.scripts]]
+commands = ["ec"]
+
+[[tool.hatch.build.hooks.build-scripts.scripts]]
+commands = ["hatch fmt --check"]
+
+[tool.hatch.build.targets.wheel]
+artifacts = ["src/pyutemplate/generated/"]
+
+[tool.hatch.version]
+path = "src/pyutemplate/__about__.py"
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = ["D", "COM812"]

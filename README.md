@@ -1,3 +1,7 @@
 # pyutemplate
 
-Python micro-package template
+Python microservice template
+
+## Building
+
+`hatch build -c`
